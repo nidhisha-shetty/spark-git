@@ -29,11 +29,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh '''
-                sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no \
-                main.py test_main.py requirements.txt \
-                $LABS_USR@g01.itversity.com:/home/itv024538/wk5-assignment
-                '''
+                sh 'sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no -r . $LABS_USR@g01.itversity.com:/home/itv024538/wk5-assignment'
             }
         }
     }
