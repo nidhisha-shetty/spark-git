@@ -1,27 +1,40 @@
 pipeline {
     agent any
-
+    environment {
+        LABS = credentials('labcreds')
+    }
     stages {
         stage('Build') {
             steps {
-               echo "build is completed successfully"
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                '''
             }
         }
+
         stage('Test') {
             steps {
-               echo "tests completed successfully"
+                sh '''
+                    . venv/bin/activate
+                    pytest
+                '''
             }
         }
         stage('Package') {
             steps {
-               echo "package completed successfully"
+                sh 'zip -r spark-git.zip .'
             }
         }
         stage('Deploy') {
             steps {
-               echo "deploy completed successfully"
+                sh """
+                sshpass -p $LABS_PSW scp -o StrictHostKeyChecking=no \
+                main.py test_main.py requirements.txt \
+                $LABS_USR@g01.itversity.com:/home/itv024538/wk5-assignment
+                """
             }
         }
-  
     }
 }
